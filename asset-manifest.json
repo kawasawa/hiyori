@@ -1,0 +1,17 @@
+{
+  "files": {
+    "main.css": "/hiyori/static/css/main.073c9b0a.css",
+    "main.js": "/hiyori/static/js/main.7318e299.js",
+    "static/js/787.c1cb33e3.chunk.js": "/hiyori/static/js/787.c1cb33e3.chunk.js",
+    "service-worker.js": "/hiyori/service-worker.js",
+    "static/media/logo.svg": "/hiyori/static/media/logo.103b5fa18196d5665a7e12318285c916.svg",
+    "index.html": "/hiyori/index.html",
+    "main.073c9b0a.css.map": "/hiyori/static/css/main.073c9b0a.css.map",
+    "main.7318e299.js.map": "/hiyori/static/js/main.7318e299.js.map",
+    "787.c1cb33e3.chunk.js.map": "/hiyori/static/js/787.c1cb33e3.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.073c9b0a.css",
+    "static/js/main.7318e299.js"
+  ]
+}
