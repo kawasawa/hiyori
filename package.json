@@ -3,13 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^13.3.0",
-    "@testing-library/user-event": "^13.5.0",
-    "@types/jest": "^27.5.2",
-    "@types/node": "^17.0.45",
-    "@types/react": "^18.0.17",
-    "@types/react-dom": "^18.0.6",
+    "@emotion/react": "^11.10.0",
+    "@emotion/styled": "^11.10.0",
+    "@mui/icons-material": "^5.8.4",
+    "@mui/material": "^5.10.1",
+    "axios": "^0.27.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
@@ -28,11 +26,33 @@
     "workbox-strategies": "^6.5.4",
     "workbox-streams": "^6.5.4"
   },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.3.0",
+    "@testing-library/user-event": "^14.4.3",
+    "@types/axios": "^0.14.0",
+    "@types/jest": "^28.1.7",
+    "@types/node": "^18.7.8",
+    "@types/react": "^18.0.17",
+    "@types/react-dom": "^18.0.6",
+    "@typescript-eslint/eslint-plugin": "^5.13.0",
+    "@typescript-eslint/parser": "^5.13.0",
+    "eslint": "7.*",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-react": "^7.29.2",
+    "eslint-plugin-react-hooks": "^4.3.0",
+    "eslint-plugin-simple-import-sort": "^7.0.0",
+    "gh-pages": "^4.0.0",
+    "prettier": "^2.5.1",
+    "ts-jest": "^28.0.8"
+  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build && cp -f build/index.html build/404.html",
     "build:win": "react-scripts build && copy /y build\\index.html build\\404.html",
-    "test": "react-scripts test",
+    "lint": "eslint . --ext js,jsx,ts,tsx --max-warnings 0",
+    "test": "react-scripts test --watchAll=false --passWithNoTests --noStackTrace",
+    "test:cov": "react-scripts test --watchAll=false --coverage",
     "eject": "react-scripts eject",
     "deploy:local": "yarn build && gh-pages -d build",
     "deploy:local:win": "yarn build:win && gh-pages -d build"
@@ -54,9 +74,6 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "gh-pages": "^4.0.0"
   },
   "homepage": "https://kawasawa.github.io/hiyori"
 }
