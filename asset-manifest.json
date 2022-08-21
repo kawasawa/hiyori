@@ -1,17 +1,23 @@
 {
   "files": {
-    "main.css": "/hiyori/static/css/main.073c9b0a.css",
-    "main.js": "/hiyori/static/js/main.7318e299.js",
+    "main.css": "/hiyori/static/css/main.4c76e50d.css",
+    "main.js": "/hiyori/static/js/main.95ec0033.js",
     "static/js/787.c1cb33e3.chunk.js": "/hiyori/static/js/787.c1cb33e3.chunk.js",
+    "static/media/rainy.webp": "/hiyori/static/media/rainy.c2c156cc6b87ad584e83.webp",
+    "static/media/foggy.webp": "/hiyori/static/media/foggy.78d3af0b4233941d63c5.webp",
+    "static/media/snowy.webp": "/hiyori/static/media/snowy.1f2a492505128d541383.webp",
+    "static/media/few-cloudy.webp": "/hiyori/static/media/few-cloudy.68caaf1fff4f34d7ab96.webp",
+    "static/media/stormy.webp": "/hiyori/static/media/stormy.6502afd3cedf59e15a4c.webp",
     "service-worker.js": "/hiyori/service-worker.js",
-    "static/media/logo.svg": "/hiyori/static/media/logo.103b5fa18196d5665a7e12318285c916.svg",
+    "static/media/cloudy.webp": "/hiyori/static/media/cloudy.fc6babbc6c172101587c.webp",
+    "static/media/sunny.webp": "/hiyori/static/media/sunny.799a0e830c7b2cd02a6a.webp",
     "index.html": "/hiyori/index.html",
-    "main.073c9b0a.css.map": "/hiyori/static/css/main.073c9b0a.css.map",
-    "main.7318e299.js.map": "/hiyori/static/js/main.7318e299.js.map",
+    "main.4c76e50d.css.map": "/hiyori/static/css/main.4c76e50d.css.map",
+    "main.95ec0033.js.map": "/hiyori/static/js/main.95ec0033.js.map",
     "787.c1cb33e3.chunk.js.map": "/hiyori/static/js/787.c1cb33e3.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.073c9b0a.css",
-    "static/js/main.7318e299.js"
+    "static/css/main.4c76e50d.css",
+    "static/js/main.95ec0033.js"
   ]
 }
