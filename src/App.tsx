@@ -1,4 +1,5 @@
 import 'react-toastify/dist/ReactToastify.css';
+import 'leaflet/dist/leaflet.css';
 
 import { colors, createTheme, ThemeProvider } from '@mui/material';
 import i18n from 'i18next';

@@ -5,11 +5,6 @@ import { OpenWeatherMapApiResponse } from '../api/responses';
 import { constants } from '../constants';
 import { handleError } from '../errors';
 
-export type Coordinate = {
-  lat: number;
-  lon: number;
-};
-
 export type WeatherGroup =
   | 'Thunderstorm'
   | 'Drizzle'
@@ -22,11 +17,16 @@ export type WeatherGroup =
 
 export type Forecast = {
   date: Date;
+  ymd: string;
   group: WeatherGroup;
   summary: string;
   description: string;
   temperature: number;
-  wind: number;
+  feelsLike: number;
+  humidity: number;
+  pressure: number;
+  visibility: number;
+  windSpeed: number;
   iconUrl: string;
 };
 
@@ -64,24 +64,34 @@ const getWeatherGroup = (weatherId: number): WeatherGroup => {
  * @param units 単位
  * @returns 気象情報
  */
-const getWeatherForecast = async (coord: Coordinate, units: 'metric' | 'imperial') => {
+const getWeatherForecast = async (coord: { lat: number; lng: number }, units: 'metric' | 'imperial') => {
   const client = createInstance();
   const response = await client.get<OpenWeatherMapApiResponse>(
-    `${constants.url.getWeatherForecast}&lat=${coord.lat}&lon=${coord.lon}&units=${units}&lang=ja`
+    `${constants.url.getWeatherForecast}&lat=${coord.lat}&lon=${coord.lng}&units=${units}&lang=ja`
   );
   if (response.data.cod !== '200') throw new Error(response.data.message);
 
   const forecasts: Forecast[] = [];
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   response.data.list!.map((record) => {
+    const date = new Date(record.dt_txt.replaceAll('-', '/'));
+    date.setTime(date.getTime() + 1000 * 60 * 60 * 9); // JST として扱う
     forecasts.push({
-      date: new Date(record.dt_txt),
+      date: date,
+      ymd: `${date.getFullYear().toString()}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date
+        .getDate()
+        .toString()
+        .padStart(2, '0')}`,
       group: getWeatherGroup(record.weather[0].id),
       summary: record.weather[0].main,
       description: record.weather[0].description,
-      temperature: record.main.temp,
-      wind: record.wind.speed,
-      iconUrl: `${constants.url.getWeatherIcon}${record.weather[0].icon}@2x.png`,
+      temperature: Math.round(record.main.temp), // 整数で保持する
+      feelsLike: Math.round(record.main.feels_like), // 整数で保持する
+      humidity: record.main.humidity,
+      pressure: record.main.pressure,
+      visibility: record.visibility,
+      windSpeed: Math.round(record.wind.speed),
+      iconUrl: `${constants.url.getWeatherIcon}${record.weather[0].icon}%s.png`,
     });
   });
 
@@ -96,7 +106,7 @@ const getWeatherForecast = async (coord: Coordinate, units: 'metric' | 'imperial
   } as Weather;
 };
 
-export const useWeatherForecast = (coord: Coordinate) => {
+export const useWeatherForecast = (coord: { lat: number; lng: number }) => {
   const [buffer, setBuffer] = useState<Weather>();
 
   useEffect(() => {

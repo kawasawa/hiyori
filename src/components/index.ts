@@ -1,1 +1,2 @@
-export { Banner } from './Banner';
+export { Footer } from './Footer';
+export { WeatherForecast } from './WeatherForecast';

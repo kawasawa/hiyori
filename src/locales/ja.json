@@ -1,3 +1,13 @@
 {
+  "label.weatherForecast__temperature": "気温",
+  "label.weatherForecast__feelsLike": "体感温度",
+  "label.weatherForecast__windSpeed": "風速",
+  "label.weatherForecast__humidity": "湿度",
+  "label.weatherForecast__visibility": "視界",
+  "label.weatherForecast__pressure": "気圧",
+  "label.weatherForecast__24forecast": "24時間推移",
+
+  "format.weatherForecast__cityWeather": "%s の天気",
+
   "__EOF__": ""
 }
