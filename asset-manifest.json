@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/hiyori/static/css/main.4c76e50d.css",
-    "main.js": "/hiyori/static/js/main.eafccda6.js",
+    "main.css": "/hiyori/static/css/main.83b07833.css",
+    "main.js": "/hiyori/static/js/main.e6adaaa5.js",
     "static/js/787.c1cb33e3.chunk.js": "/hiyori/static/js/787.c1cb33e3.chunk.js",
     "static/media/rainy.webp": "/hiyori/static/media/rainy.c2c156cc6b87ad584e83.webp",
     "static/media/foggy.webp": "/hiyori/static/media/foggy.78d3af0b4233941d63c5.webp",
@@ -12,12 +12,12 @@
     "static/media/cloudy.webp": "/hiyori/static/media/cloudy.fc6babbc6c172101587c.webp",
     "static/media/sunny.webp": "/hiyori/static/media/sunny.799a0e830c7b2cd02a6a.webp",
     "index.html": "/hiyori/index.html",
-    "main.4c76e50d.css.map": "/hiyori/static/css/main.4c76e50d.css.map",
-    "main.eafccda6.js.map": "/hiyori/static/js/main.eafccda6.js.map",
+    "main.83b07833.css.map": "/hiyori/static/css/main.83b07833.css.map",
+    "main.e6adaaa5.js.map": "/hiyori/static/js/main.e6adaaa5.js.map",
     "787.c1cb33e3.chunk.js.map": "/hiyori/static/js/787.c1cb33e3.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.4c76e50d.css",
-    "static/js/main.eafccda6.js"
+    "static/css/main.83b07833.css",
+    "static/js/main.e6adaaa5.js"
   ]
 }
