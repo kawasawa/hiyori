@@ -9,5 +9,7 @@
 
   "format.weatherForecast__cityWeather": "%s の天気",
 
+  "command.getCurrentPosition": "現在地を取得する",
+
   "__EOF__": ""
 }

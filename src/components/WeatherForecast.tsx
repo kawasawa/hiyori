@@ -1,9 +1,22 @@
 import './WeatherForecast.css';
 
-import { Box, Container, experimental_sx, Fade, Grid, LinearProgress, Stack, styled, Typography } from '@mui/material';
+import { MyLocation as MyLocationIcon } from '@mui/icons-material';
+import {
+  Box,
+  Container,
+  experimental_sx,
+  Fade,
+  Grid,
+  IconButton,
+  LinearProgress,
+  Stack,
+  styled,
+  Tooltip,
+  Typography,
+} from '@mui/material';
 import jaLocale from 'apexcharts/dist/locales/ja.json';
 import Leaflet, { LatLng } from 'leaflet';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Chart from 'react-apexcharts';
 import { useTranslation } from 'react-i18next';
 import { MapContainer, Marker, TileLayer } from 'react-leaflet';
@@ -16,6 +29,7 @@ import imageRainy from '../assets/rainy.webp';
 import imageSnowy from '../assets/snowy.webp';
 import imageStormy from '../assets/stormy.webp';
 import imageSunny from '../assets/sunny.webp';
+import { handleError } from '../errors';
 import { useWeatherForecast } from '../hooks';
 import { groupBy } from '../utils/Array';
 
@@ -34,7 +48,7 @@ const Background = styled(Box)(
 
 const DarkRoundBox = styled(Box)(
   experimental_sx({
-    bgcolor: '#254F8FBB',
+    background: '#254F8FBB',
     borderRadius: 2,
     boxShadow: 1,
   })
@@ -73,11 +87,22 @@ export const WeatherForecast = () => {
 
   const groupWeather = useMemo(() => weather && groupBy(weather.forecasts, (f) => f.ymd), [weather]);
 
+  const onClickGetCurrentPosition = useCallback(() => {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setCoord(new LatLng(position.coords.latitude, position.coords.longitude));
+      },
+      (error) => {
+        handleError(error);
+      }
+    );
+  }, []);
+
   useEffect(() => {
-    navigator.geolocation.getCurrentPosition((pos) => {
-      setCoord(new LatLng(pos.coords.latitude, pos.coords.longitude));
+    navigator.geolocation.getCurrentPosition((position) => {
+      setCoord(new LatLng(position.coords.latitude, position.coords.longitude));
     });
-  }, [setCoord]);
+  }, []);
 
   if (!weather)
     return (
@@ -125,9 +150,16 @@ export const WeatherForecast = () => {
           <Grid container spacing={2}>
             <Grid item xs={12} sm={7} order={0}>
               <DarkRoundBox sx={{ p: { xs: 1.5, sm: 4 } }}>
-                <Typography sx={{ fontSize: 20, fontWeight: 'bold' }}>
-                  {util.format(t('format.weatherForecast__cityWeather'), weather.city)}
-                </Typography>
+                <Stack direction="row" alignItems="center" spacing={1.5}>
+                  <Typography sx={{ fontSize: 20, fontWeight: 'bold' }}>
+                    {util.format(t('format.weatherForecast__cityWeather'), weather.city)}
+                  </Typography>
+                  <Tooltip title={t('command.getCurrentPosition')}>
+                    <IconButton sx={{ background: '#254F8F88' }} onClick={onClickGetCurrentPosition}>
+                      <MyLocationIcon />
+                    </IconButton>
+                  </Tooltip>
+                </Stack>
                 <Typography sx={{ fontSize: 16 }}>{`${(weather.forecasts[0].date.getMonth() + 1)
                   .toString()
                   .padStart(2, '0')}/${weather.forecasts[0].date.getDate().toString().padStart(2, '0')}
