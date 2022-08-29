@@ -16,10 +16,10 @@ import {
 } from '@mui/material';
 import jaLocale from 'apexcharts/dist/locales/ja.json';
 import Leaflet, { LatLng } from 'leaflet';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Chart from 'react-apexcharts';
 import { useTranslation } from 'react-i18next';
-import { MapContainer, Marker, TileLayer } from 'react-leaflet';
+import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 import * as util from 'util';
 
 import imageCloudy from '../assets/cloudy.webp';
@@ -58,6 +58,7 @@ const DarkRoundBox = styled(Box)(
 export const WeatherForecast = () => {
   const [t] = useTranslation();
   const [coord, setCoord] = useState<LatLng>(new LatLng(35.69, 139.69));
+  const markerRef = useRef<any>(null);
   const weather = useWeatherForecast(coord);
 
   const chartWeather = useMemo(() => weather && weather.forecasts.slice(0, 9), [weather]);
@@ -86,6 +87,11 @@ export const WeatherForecast = () => {
   );
 
   const groupWeather = useMemo(() => weather && groupBy(weather.forecasts, (f) => f.ymd), [weather]);
+
+  const onMarkerDragend = useCallback(() => {
+    const marker = markerRef.current;
+    if (marker !== null) setCoord(marker.getLatLng());
+  }, []);
 
   const onClickGetCurrentPosition = useCallback(() => {
     navigator.geolocation.getCurrentPosition(
@@ -226,11 +232,21 @@ export const WeatherForecast = () => {
                   tap={false}
                   tapTolerance={undefined}
                   scrollWheelZoom={false}
-                  zoomControl={false}
                   attributionControl={false}
                 >
                   <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                  <Marker position={coord} />
+                  <Marker
+                    ref={markerRef}
+                    position={coord}
+                    eventHandlers={{
+                      dragend: onMarkerDragend,
+                    }}
+                    draggable
+                  >
+                    <Popup>
+                      {coord.lat}, {coord.lng}
+                    </Popup>
+                  </Marker>
                 </MapContainer>
               </DarkRoundBox>
             </Grid>
