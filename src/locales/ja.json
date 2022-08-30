@@ -11,5 +11,7 @@
 
   "command.getCurrentPosition": "現在地を取得する",
 
+  "message.notify__getCurrentPosition--succeeded": "現在地の情報を取得しました。",
+
   "__EOF__": ""
 }

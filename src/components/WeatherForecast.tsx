@@ -20,6 +20,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Chart from 'react-apexcharts';
 import { useTranslation } from 'react-i18next';
 import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
+import { toast } from 'react-toastify';
 import * as util from 'util';
 
 import imageCloudy from '../assets/cloudy.webp';
@@ -97,12 +98,13 @@ export const WeatherForecast = () => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         setCoord(new LatLng(position.coords.latitude, position.coords.longitude));
+        toast.info(t('message.notify__getCurrentPosition--succeeded'));
       },
       (error) => {
         handleError(error);
       }
     );
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition((position) => {
