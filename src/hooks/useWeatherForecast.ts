@@ -106,20 +106,20 @@ const getWeatherForecast = async (coord: { lat: number; lng: number }, units: 'm
   } as Weather;
 };
 
-export const useWeatherForecast = (coord: { lat: number; lng: number }) => {
+export const useWeatherForecast = (coord?: { lat: number; lng: number }) => {
   const [buffer, setBuffer] = useState<Weather>();
 
   useEffect(() => {
     const func = async () => {
       try {
-        const tmp = await getWeatherForecast(coord, 'metric');
+        const tmp = await getWeatherForecast(coord!, 'metric');
         setBuffer(tmp);
       } catch (err) {
         handleError(err);
       }
     };
 
-    func();
+    if (coord) func();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [coord]);
 

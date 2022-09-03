@@ -6,6 +6,9 @@
   "label.weatherForecast__visibility": "視界",
   "label.weatherForecast__pressure": "気圧",
   "label.weatherForecast__24forecast": "24時間推移",
+  "label.weatherForecast__today": "本日",
+  "label.weatherForecast__tomorrow": "明日",
+  "label.weatherForecast__dayAfterTomorrow": "明後日",
 
   "format.weatherForecast__cityWeather": "%s の天気",
 

@@ -2,6 +2,7 @@ import './WeatherForecast.css';
 
 import { MyLocation as MyLocationIcon } from '@mui/icons-material';
 import {
+  Backdrop,
   Box,
   Container,
   experimental_sx,
@@ -58,10 +59,13 @@ const DarkRoundBox = styled(Box)(
 // eslint-disable-next-line complexity
 export const WeatherForecast = () => {
   const [t] = useTranslation();
-  const [coord, setCoord] = useState<LatLng>(new LatLng(35.69, 139.69));
+  const [isPending, setIsPending] = useState(false);
+  const [coord, setCoord] = useState<LatLng>();
+  const mapRef = useRef<any>();
   const markerRef = useRef<any>(null);
   const weather = useWeatherForecast(coord);
 
+  const groupWeather = useMemo(() => weather && groupBy(weather.forecasts, (f) => f.ymd), [weather]);
   const chartWeather = useMemo(() => weather && weather.forecasts.slice(0, 9), [weather]);
   const maxTemperature = useMemo(
     () => chartWeather && chartWeather.map((f) => f.temperature).reduce((_1, _2) => Math.max(_1, _2)) + 1,
@@ -87,32 +91,48 @@ export const WeatherForecast = () => {
     [chartWeather]
   );
 
-  const groupWeather = useMemo(() => weather && groupBy(weather.forecasts, (f) => f.ymd), [weather]);
-
   const onMarkerDragend = useCallback(() => {
     const marker = markerRef.current;
     if (marker !== null) setCoord(marker.getLatLng());
   }, []);
 
   const onClickGetCurrentPosition = useCallback(() => {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setCoord(new LatLng(position.coords.latitude, position.coords.longitude));
-        toast.info(t('message.notify__getCurrentPosition--succeeded'));
-      },
-      (error) => {
-        handleError(error);
-      }
+    setIsPending(true);
+    setTimeout(
+      () =>
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            setIsPending(false);
+            setCoord(new LatLng(position.coords.latitude, position.coords.longitude));
+            toast.info(t('message.notify__getCurrentPosition--succeeded'));
+          },
+          (error) => {
+            setIsPending(false);
+            handleError(error);
+          }
+        ),
+      300
     );
   }, [t]);
 
   useEffect(() => {
-    navigator.geolocation.getCurrentPosition((position) => {
-      setCoord(new LatLng(position.coords.latitude, position.coords.longitude));
-    });
+    // 初回レンダリング時に現在地を取得する
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setCoord(new LatLng(position.coords.latitude, position.coords.longitude));
+      },
+      (error) => {
+        setCoord(new LatLng(35.69, 139.69));
+      }
+    );
   }, []);
 
-  if (!weather)
+  useEffect(() => {
+    // 位置情報が更新された際にマップを移動する
+    mapRef.current?.flyTo(coord);
+  }, [coord]);
+
+  if (!coord || !weather)
     return (
       <Box
         sx={{
@@ -156,6 +176,7 @@ export const WeatherForecast = () => {
       >
         <Container sx={{ pt: { xs: 4, sm: 12 }, pb: { xs: 4, sm: 12 } }}>
           <Grid container spacing={2}>
+            {/* 現在の気象情報 */}
             <Grid item xs={12} sm={7} order={0}>
               <DarkRoundBox sx={{ p: { xs: 1.5, sm: 4 } }}>
                 <Stack direction="row" alignItems="center" spacing={1.5}>
@@ -163,7 +184,11 @@ export const WeatherForecast = () => {
                     {util.format(t('format.weatherForecast__cityWeather'), weather.city)}
                   </Typography>
                   <Tooltip title={t('command.getCurrentPosition')}>
-                    <IconButton sx={{ background: '#254F8F88' }} onClick={onClickGetCurrentPosition}>
+                    <IconButton
+                      sx={{ background: '#254F8F88' }}
+                      disabled={isPending}
+                      onClick={onClickGetCurrentPosition}
+                    >
                       <MyLocationIcon />
                     </IconButton>
                   </Tooltip>
@@ -226,9 +251,11 @@ export const WeatherForecast = () => {
               </DarkRoundBox>
             </Grid>
 
+            {/* マップ */}
             <Grid item xs={12} sm={5} order={{ xs: 3, sm: 1 }}>
               <DarkRoundBox sx={{ height: { xs: '150px', sm: '100%' } }}>
                 <MapContainer
+                  ref={mapRef}
                   center={coord}
                   zoom={13}
                   tap={false}
@@ -253,9 +280,11 @@ export const WeatherForecast = () => {
               </DarkRoundBox>
             </Grid>
 
+            {/* グラフ */}
             <Grid item xs={12} order={{ xs: 1, sm: 2 }}>
               <DarkRoundBox>
                 <Chart
+                  height="150%"
                   series={
                     [
                       {
@@ -268,19 +297,38 @@ export const WeatherForecast = () => {
                       },
                     ] as ApexAxisChartSeries
                   }
-                  height="150%"
                   options={{
+                    title: {
+                      text: t('label.weatherForecast__24forecast'),
+                      offsetX: 5,
+                      offsetY: 10,
+                      margin: -10,
+                      style: { fontSize: '16', fontWeight: 'normal', color: 'white' },
+                    },
                     chart: {
                       defaultLocale: 'ja',
                       locales: [jaLocale],
-                      offsetY: 5,
                       toolbar: { show: false },
                       zoom: { enabled: false },
                       animations: {
                         easing: 'easeinout',
                         animateGradually: { enabled: false },
-                        dynamicAnimation: { speed: 100 },
                       },
+                    },
+                    dataLabels: {
+                      enabled: true,
+                      enabledOnSeries: [0],
+                      style: {
+                        fontSize: '11px',
+                        fontWeight: 'bold',
+                      },
+                    },
+                    tooltip: {
+                      theme: 'dark',
+                      x: { format: 'yyyy/MM/dd HH:mm' },
+                    },
+                    legend: {
+                      show: false,
                     },
                     xaxis: {
                       type: 'datetime',
@@ -315,36 +363,18 @@ export const WeatherForecast = () => {
                         opposite: true,
                       },
                     ],
-                    tooltip: {
-                      theme: 'dark',
-                      x: { format: 'yyyy/MM/dd HH:mm' },
-                    },
                     stroke: {
                       curve: 'smooth',
                       width: [3, 3],
                       dashArray: [0, 3],
                     },
                     colors: ['#7FBF7F', '#BF7FFF'],
-                    dataLabels: {
-                      enabled: true,
-                      enabledOnSeries: [0],
-                      style: {
-                        fontSize: '11px',
-                        fontWeight: 'bold',
-                      },
-                    },
-                    legend: { show: false },
-                    title: {
-                      text: t('label.weatherForecast__24forecast'),
-                      offsetX: 5,
-                      floating: true,
-                      style: { fontWeight: 'normal', color: 'white' },
-                    },
                   }}
                 />
               </DarkRoundBox>
             </Grid>
 
+            {/* 長期予報 */}
             <Grid
               item
               xs={12}
@@ -360,23 +390,33 @@ export const WeatherForecast = () => {
               <Stack direction="row" spacing={1}>
                 {groupWeather?.map((x, i) => (
                   <DarkRoundBox key={`WeatherForecast__forecasts${i}`} sx={{ py: 1 }}>
-                    <Typography noWrap sx={{ fontSize: 20, mx: 2, mb: 0.5 }}>{`${(x[1][0].date.getMonth() + 1)
-                      .toString()
-                      .padStart(2, '0')}/${x[1][0].date.getDate().toString().padStart(2, '0')}`}</Typography>
-                    <Stack direction="row" spacing={1}>
+                    <Typography noWrap sx={{ fontSize: 18, mx: 2, mb: 0.5 }}>
+                      {i === 0
+                        ? `(${t('label.weatherForecast__today')})\u00A0`
+                        : i === 1
+                        ? `(${t('label.weatherForecast__tomorrow')})\u00A0`
+                        : i === 2
+                        ? `(${t('label.weatherForecast__dayAfterTomorrow')})\u00A0`
+                        : null}
+                      {`${(x[1][0].date.getMonth() + 1).toString().padStart(2, '0')}/${x[1][0].date
+                        .getDate()
+                        .toString()
+                        .padStart(2, '0')}`}
+                      {x[1].length === 8 &&
+                        `\u00A0\u00A0${x[1].map((f) => f.temperature).reduce((_1, _2) => Math.max(_1, _2))}°~${x[1]
+                          .map((f) => f.temperature)
+                          .reduce((_1, _2) => Math.min(_1, _2))}°`}
+                    </Typography>
+                    <Stack direction="row" spacing={1} sx={{ mx: 1 }}>
                       {x[1].map((f, j) => (
                         <Stack key={`WeatherForecast__forecasts${i}--info${j}`} direction="column" alignItems="center">
-                          <Typography noWrap sx={{ fontSize: 16, mx: 2 }}>{`${f.date
+                          <Typography noWrap sx={{ fontSize: 16, mx: 1.5 }}>{`${f.date
                             .getHours()
                             .toString()
                             .padStart(2, '0')}:${f.date.getMinutes().toString().padStart(2, '0')}`}</Typography>
-                          <Stack direction="row" alignItems="start">
-                            <img src={util.format(f.iconUrl, '')} />
-                            <Stack>
-                              <Typography sx={{ fontSize: 20, mr: 1 }}>{f.temperature}°</Typography>
-                              <Typography sx={{ fontSize: 15 }}>{f.description}</Typography>
-                            </Stack>
-                          </Stack>
+                          <img src={util.format(f.iconUrl, '')} />
+                          <Typography sx={{ fontSize: 20, ml: 1 }}>{f.temperature}°</Typography>
+                          <Typography sx={{ fontSize: 14 }}>{f.description}</Typography>
                         </Stack>
                       ))}
                     </Stack>
@@ -386,6 +426,9 @@ export const WeatherForecast = () => {
             </Grid>
           </Grid>
         </Container>
+        <Backdrop sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }} open={isPending}>
+          <LinearProgress color="inherit" sx={{ width: '80%' }} />
+        </Backdrop>
       </Background>
     </Fade>
   );
