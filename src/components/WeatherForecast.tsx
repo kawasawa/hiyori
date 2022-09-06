@@ -56,6 +56,8 @@ const DarkRoundBox = styled(Box)(
   })
 );
 
+const DAY_VERTEX_COUNT = 8;
+
 // eslint-disable-next-line complexity
 export const WeatherForecast = () => {
   const [t] = useTranslation();
@@ -66,7 +68,12 @@ export const WeatherForecast = () => {
   const weather = useWeatherForecast(coord);
 
   const groupWeather = useMemo(() => weather && groupBy(weather.forecasts, (f) => f.ymd), [weather]);
-  const chartWeather = useMemo(() => weather && weather.forecasts.slice(0, 9), [weather]);
+  const groupOffset = useMemo(
+    () => (groupWeather && groupWeather[0][1].length === DAY_VERTEX_COUNT ? -1 : 0),
+    [groupWeather]
+  );
+
+  const chartWeather = useMemo(() => weather && weather.forecasts.slice(0, DAY_VERTEX_COUNT + 1), [weather]);
   const maxTemperature = useMemo(
     () => chartWeather && chartWeather.map((f) => f.temperature).reduce((_1, _2) => Math.max(_1, _2)) + 1,
     [chartWeather]
@@ -391,21 +398,21 @@ export const WeatherForecast = () => {
                 {groupWeather?.map((x, i) => (
                   <DarkRoundBox key={`WeatherForecast__forecasts${i}`} sx={{ py: 1 }}>
                     <Typography noWrap sx={{ fontSize: 18, mx: 2, mb: 0.5 }}>
-                      {i === 0
-                        ? `(${t('label.weatherForecast__today')})\u00A0`
-                        : i === 1
-                        ? `(${t('label.weatherForecast__tomorrow')})\u00A0`
-                        : i === 2
-                        ? `(${t('label.weatherForecast__dayAfterTomorrow')})\u00A0`
+                      {i === 0 + groupOffset
+                        ? `${t('label.weatherForecast__date--today')}\u00A0`
+                        : i === 1 + groupOffset
+                        ? `${t('label.weatherForecast__date--tomorrow')}\u00A0`
+                        : i === 2 + groupOffset
+                        ? `${t('label.weatherForecast__date--dayAfterTomorrow')}\u00A0`
                         : null}
                       {`${(x[1][0].date.getMonth() + 1).toString().padStart(2, '0')}/${x[1][0].date
                         .getDate()
                         .toString()
-                        .padStart(2, '0')}`}
-                      {x[1].length === 8 &&
-                        `\u00A0\u00A0${x[1].map((f) => f.temperature).reduce((_1, _2) => Math.max(_1, _2))}°~${x[1]
+                        .padStart(2, '0')}(${t(`label.weatherForecast__week--${x[1][0].date.getDay()}`)})`}
+                      {x[1].length === DAY_VERTEX_COUNT &&
+                        `\u00A0\u00A0${x[1].map((f) => f.temperature).reduce((_1, _2) => Math.min(_1, _2))}°~ ${x[1]
                           .map((f) => f.temperature)
-                          .reduce((_1, _2) => Math.min(_1, _2))}°`}
+                          .reduce((_1, _2) => Math.max(_1, _2))}°`}
                     </Typography>
                     <Stack direction="row" spacing={1} sx={{ mx: 1 }}>
                       {x[1].map((f, j) => (
