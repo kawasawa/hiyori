@@ -1,6 +1,6 @@
 import './WeatherForecast.css';
 
-import { MyLocation as MyLocationIcon } from '@mui/icons-material';
+import { MyLocation as MyLocationIcon, Navigation as NavigationIcon } from '@mui/icons-material';
 import {
   Backdrop,
   Box,
@@ -181,11 +181,11 @@ export const WeatherForecast = () => {
           },
         }}
       >
-        <Container sx={{ pt: { xs: 4, sm: 12 }, pb: { xs: 4, sm: 12 } }}>
+        <Container sx={{ pt: [4, 12], pb: [4, 12] }}>
           <Grid container spacing={2}>
             {/* 現在の気象情報 */}
             <Grid item xs={12} sm={7} order={0}>
-              <DarkRoundBox sx={{ p: { xs: 1.5, sm: 4 } }}>
+              <DarkRoundBox sx={{ p: [2, 4] }}>
                 <Stack direction="row" alignItems="center" spacing={1.5}>
                   <Typography sx={{ fontSize: 20, fontWeight: 'bold' }}>
                     {util.format(t('format.weatherForecast__cityWeather'), weather.city)}
@@ -226,29 +226,35 @@ export const WeatherForecast = () => {
                   </Grid>
                 </Grid>
                 <Grid container alignItems="center" sx={{ mt: 1 }}>
-                  <Grid item sx={{ mx: 1 }}>
+                  <Grid item sx={{ mr: 2 }}>
                     <Stack>
                       <Typography sx={{ fontSize: 13 }}>{t('label.weatherForecast__windSpeed')}</Typography>
-                      <Typography sx={{ fontSize: 20 }}>{weather.forecasts[0]?.windSpeed} m/s</Typography>
+                      <Stack direction="row" alignItems="center">
+                        <Typography sx={{ fontSize: 20 }}>{weather.forecasts[0]?.windSpeed} m/s</Typography>
+                        <NavigationIcon
+                          sx={{ fontSize: 20, transform: `rotate(${weather.forecasts[0]?.windDeg}deg)` }}
+                        />
+                      </Stack>
                     </Stack>
                   </Grid>
-                  <Grid item sx={{ mx: 1 }}>
+                  <Grid item sx={{ mr: 2 }}>
                     <Stack>
                       <Typography sx={{ fontSize: 13 }}>{t('label.weatherForecast__humidity')}</Typography>
                       <Typography sx={{ fontSize: 20 }}>{weather.forecasts[0]?.humidity}%</Typography>
                     </Stack>
                   </Grid>
-                  <Grid item sx={{ mx: 1 }}>
+                  <Grid item sx={{ mr: 2 }}>
                     <Stack>
                       <Typography sx={{ fontSize: 13 }}>{t('label.weatherForecast__visibility')}</Typography>
                       <Typography sx={{ fontSize: 20 }}>
+                        {/* km は小数点以下第一位まで表示 */}
                         {weather.forecasts[0]?.visibility < 1000
                           ? `${weather.forecasts[0]?.visibility} m`
-                          : `${weather.forecasts[0]?.visibility / 1000} km`}
+                          : `${Math.floor(weather.forecasts[0]?.visibility / 100) / 10} km`}
                       </Typography>
                     </Stack>
                   </Grid>
-                  <Grid item sx={{ mx: 1 }}>
+                  <Grid item>
                     <Stack>
                       <Typography sx={{ fontSize: 13 }}>{t('label.weatherForecast__pressure')}</Typography>
                       <Typography sx={{ fontSize: 20 }}>{weather.forecasts[0]?.pressure} hPa</Typography>
@@ -260,7 +266,7 @@ export const WeatherForecast = () => {
 
             {/* マップ */}
             <Grid item xs={12} sm={5} order={{ xs: 3, sm: 1 }}>
-              <DarkRoundBox sx={{ height: { xs: '150px', sm: '100%' } }}>
+              <DarkRoundBox sx={{ height: ['150px', '100%'] }}>
                 <MapContainer
                   ref={mapRef}
                   center={coord}
@@ -423,6 +429,10 @@ export const WeatherForecast = () => {
                             .padStart(2, '0')}:${f.date.getMinutes().toString().padStart(2, '0')}`}</Typography>
                           <img src={util.format(f.iconUrl, '')} />
                           <Typography sx={{ fontSize: 20, ml: 1 }}>{f.temperature}°</Typography>
+                          <Stack direction="row" alignItems="center" sx={{ mt: 0.5 }}>
+                            <Typography sx={{ fontSize: 14 }}>{f.windSpeed} m/s</Typography>
+                            <NavigationIcon sx={{ fontSize: 14, transform: `rotate(${f.windDeg}deg)` }} />
+                          </Stack>
                           <Typography sx={{ fontSize: 14 }}>{f.description}</Typography>
                         </Stack>
                       ))}

@@ -27,6 +27,7 @@ export type Forecast = {
   pressure: number;
   visibility: number;
   windSpeed: number;
+  windDeg: number;
   iconUrl: string;
 };
 
@@ -91,6 +92,7 @@ const getWeatherForecast = async (coord: { lat: number; lng: number }, units: 'm
       pressure: record.main.pressure,
       visibility: record.visibility,
       windSpeed: Math.round(record.wind.speed),
+      windDeg: Math.round(record.wind.deg),
       iconUrl: `${constants.url.getWeatherIcon}${record.weather[0].icon}%s.png`,
     });
   });
