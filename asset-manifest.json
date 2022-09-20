@@ -1,8 +1,8 @@
 {
   "files": {
-    "main.css": "/hiyori/static/css/main.e083b01c.css",
-    "main.js": "/hiyori/static/js/main.68f4378c.js",
-    "static/js/787.c1cb33e3.chunk.js": "/hiyori/static/js/787.c1cb33e3.chunk.js",
+    "main.css": "/hiyori/static/css/main.847993ec.css",
+    "main.js": "/hiyori/static/js/main.74b2e251.js",
+    "static/js/27.d4d868b1.chunk.js": "/hiyori/static/js/27.d4d868b1.chunk.js",
     "static/media/rainy.webp": "/hiyori/static/media/rainy.c2c156cc6b87ad584e83.webp",
     "static/media/foggy.webp": "/hiyori/static/media/foggy.78d3af0b4233941d63c5.webp",
     "static/media/snowy.webp": "/hiyori/static/media/snowy.1f2a492505128d541383.webp",
@@ -11,13 +11,10 @@
     "service-worker.js": "/hiyori/service-worker.js",
     "static/media/cloudy.webp": "/hiyori/static/media/cloudy.fc6babbc6c172101587c.webp",
     "static/media/sunny.webp": "/hiyori/static/media/sunny.799a0e830c7b2cd02a6a.webp",
-    "index.html": "/hiyori/index.html",
-    "main.e083b01c.css.map": "/hiyori/static/css/main.e083b01c.css.map",
-    "main.68f4378c.js.map": "/hiyori/static/js/main.68f4378c.js.map",
-    "787.c1cb33e3.chunk.js.map": "/hiyori/static/js/787.c1cb33e3.chunk.js.map"
+    "index.html": "/hiyori/index.html"
   },
   "entrypoints": [
-    "static/css/main.e083b01c.css",
-    "static/js/main.68f4378c.js"
+    "static/css/main.847993ec.css",
+    "static/js/main.74b2e251.js"
   ]
 }
