@@ -1,1 +1,1 @@
-export { useWeatherForecast } from './useWeatherForecast';
+export * from './useWeatherForecast';

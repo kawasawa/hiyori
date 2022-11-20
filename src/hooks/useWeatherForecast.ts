@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { createInstance } from '../api/axios';
 import { OpenWeatherMapApiResponse } from '../api/responses';
 import { constants } from '../constants';
-import { handleError } from '../errors';
+import { handleError } from '../utils/errors';
 
 export type WeatherGroup =
   | 'Thunderstorm'

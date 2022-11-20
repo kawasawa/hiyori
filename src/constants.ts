@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+
 export const constants = {
   meta: {
     title: 'ひより',

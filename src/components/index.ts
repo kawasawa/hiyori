@@ -1,2 +1,2 @@
-export { Footer } from './Footer';
-export { WeatherForecast } from './WeatherForecast';
+export * from './Footer';
+export * from './WeatherForecast';

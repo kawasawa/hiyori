@@ -31,9 +31,9 @@ import imageRainy from '../assets/rainy.webp';
 import imageSnowy from '../assets/snowy.webp';
 import imageStormy from '../assets/stormy.webp';
 import imageSunny from '../assets/sunny.webp';
-import { handleError } from '../errors';
 import { useWeatherForecast } from '../hooks';
-import { groupBy } from '../utils/Array';
+import { groupBy } from '../utils/array';
+import { handleError } from '../utils/errors';
 
 Leaflet.Icon.Default.imagePath = '//cdnjs.cloudflare.com/ajax/libs/leaflet/1.8.0/images/';
 
