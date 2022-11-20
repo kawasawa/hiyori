@@ -63,7 +63,9 @@ export const WeatherForecast = () => {
   const [t] = useTranslation();
   const [isPending, setIsPending] = useState(false);
   const [coord, setCoord] = useState<LatLng>();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const mapRef = useRef<any>();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const markerRef = useRef<any>(null);
   const weather = useWeatherForecast(coord);
 
@@ -130,6 +132,7 @@ export const WeatherForecast = () => {
       },
       (error) => {
         setCoord(new LatLng(35.69, 139.69));
+        console.log(error);
       }
     );
   }, []);
@@ -370,6 +373,7 @@ export const WeatherForecast = () => {
                           style: { colors: 'white' },
                           formatter: (val) => `${val.toFixed(0)}%`,
                         },
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                         tickAmount: (maxHumidity! - minHumidity!) / 10,
                         min: minHumidity,
                         max: maxHumidity,
