@@ -14,6 +14,8 @@ import {
   styled,
   Tooltip,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import jaLocale from 'apexcharts/dist/locales/ja.json';
 import Leaflet, { LatLng } from 'leaflet';
@@ -24,14 +26,26 @@ import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 import { toast } from 'react-toastify';
 import * as util from 'util';
 
-import imageCloudy from '../assets/cloudy.webp';
-import imageFewCloudy from '../assets/few-cloudy.webp';
-import imageFoggy from '../assets/foggy.webp';
-import imageRainy from '../assets/rainy.webp';
-import imageSnowy from '../assets/snowy.webp';
-import imageStormy from '../assets/stormy.webp';
-import imageSunny from '../assets/sunny.webp';
+import iconCloudy from '../assets/weatherIcon/cloudy.png';
+import iconDay from '../assets/weatherIcon/day.png';
+import iconDayCloudy from '../assets/weatherIcon/day-cloudy.png';
+import iconFoggy from '../assets/weatherIcon/foggy.png';
+import iconNight from '../assets/weatherIcon/night.png';
+import iconNightCloudy from '../assets/weatherIcon/night-cloudy.png';
+import iconRainy from '../assets/weatherIcon/rainy.png';
+import iconSnowy from '../assets/weatherIcon/snowy.png';
+import iconStormy from '../assets/weatherIcon/stormy.png';
+import imageCloudy from '../assets/weatherImage/cloudy.webp';
+import imageDay from '../assets/weatherImage/day.webp';
+import imageDayCloudy from '../assets/weatherImage/day-cloudy.webp';
+import imageFoggy from '../assets/weatherImage/foggy.webp';
+import imageNight from '../assets/weatherImage/night.webp';
+import imageNightCloudy from '../assets/weatherImage/night-cloudy.webp';
+import imageRainy from '../assets/weatherImage/rainy.webp';
+import imageSnowy from '../assets/weatherImage/snowy.webp';
+import imageStormy from '../assets/weatherImage/stormy.webp';
 import { useWeatherForecast } from '../hooks';
+import { Forecast } from '../hooks/useWeatherForecast';
 import { groupBy } from '../utils/array';
 import { handleError } from '../utils/errors';
 
@@ -60,6 +74,10 @@ const DAY_VERTEX_COUNT = 8;
 
 // eslint-disable-next-line complexity
 export const WeatherForecast = () => {
+  const theme = useTheme();
+  const isXs = useMediaQuery(theme.breakpoints.down('sm'));
+  const leSm = useMediaQuery(theme.breakpoints.down('md'));
+
   const [t] = useTranslation();
   const [isPending, setIsPending] = useState(false);
   const [coord, setCoord] = useState<LatLng>();
@@ -99,6 +117,54 @@ export const WeatherForecast = () => {
       Math.max((Math.floor(chartWeather.map((f) => f.humidity).reduce((_1, _2) => Math.min(_1, _2)) / 10) - 1) * 10, 0),
     [chartWeather]
   );
+
+  const inDayTime = (date: Date) => 6 <= date.getHours() && date.getHours() <= 18;
+
+  // eslint-disable-next-line complexity
+  const getWeatherImage = useCallback((forecast: Forecast) => {
+    switch (forecast.group) {
+      case 'Thunderstorm':
+        return imageStormy;
+      case 'Drizzle':
+        return imageRainy;
+      case 'Rain':
+        return imageRainy;
+      case 'Snow':
+        return imageSnowy;
+      case 'Atmosphere':
+        return imageFoggy;
+      case 'Clouds':
+        return imageCloudy;
+      case 'FewClouds':
+        return inDayTime(forecast.date) ? imageDayCloudy : imageNightCloudy;
+      case 'Clear':
+      default:
+        return inDayTime(forecast.date) ? imageDay : imageNight;
+    }
+  }, []);
+
+  // eslint-disable-next-line complexity
+  const getWeatherIcon = useCallback((forecast: Forecast) => {
+    switch (forecast.group) {
+      case 'Thunderstorm':
+        return iconStormy;
+      case 'Drizzle':
+        return iconRainy;
+      case 'Rain':
+        return iconRainy;
+      case 'Snow':
+        return iconSnowy;
+      case 'Atmosphere':
+        return iconFoggy;
+      case 'Clouds':
+        return iconCloudy;
+      case 'FewClouds':
+        return inDayTime(forecast.date) ? iconDayCloudy : iconNightCloudy;
+      case 'Clear':
+      default:
+        return inDayTime(forecast.date) ? iconDay : iconNight;
+    }
+  }, []);
 
   const onMarkerDragend = useCallback(() => {
     const marker = markerRef.current;
@@ -158,32 +224,7 @@ export const WeatherForecast = () => {
 
   return (
     <Fade in={true} timeout={1500}>
-      <Background
-        sx={{
-          backgroundImage: () => {
-            switch (weather.forecasts[0].group) {
-              case 'Thunderstorm':
-                return `url(${imageStormy})`;
-              case 'Drizzle':
-                return `url(${imageRainy})`;
-              case 'Rain':
-                return `url(${imageRainy})`;
-              case 'Snow':
-                return `url(${imageSnowy})`;
-              case 'Atmosphere':
-                return `url(${imageFoggy})`;
-              case 'Clear':
-                return `url(${imageSunny})`;
-              case 'Clouds':
-                return `url(${imageCloudy})`;
-              case 'FewClouds':
-                return `url(${imageFewCloudy})`;
-              default:
-                return `url(${imageSunny})`;
-            }
-          },
-        }}
-      >
+      <Background sx={{ backgroundImage: `url(${getWeatherImage(weather.forecasts[0])})` }}>
         <Container sx={{ pt: [4, 12], pb: [4, 12] }}>
           <Grid container spacing={2}>
             {/* 現在の気象情報 */}
@@ -203,21 +244,26 @@ export const WeatherForecast = () => {
                     </IconButton>
                   </Tooltip>
                 </Stack>
-                <Typography sx={{ fontSize: 16 }}>{`${(weather.forecasts[0].date.getMonth() + 1)
-                  .toString()
-                  .padStart(2, '0')}/${weather.forecasts[0].date.getDate().toString().padStart(2, '0')}
-                  ${weather.forecasts[0].date.getHours().toString().padStart(2, '0')}:${weather.forecasts[0].date
-                  .getMinutes()
-                  .toString()
-                  .padStart(2, '0')}`}</Typography>
-                <Grid container alignItems="center">
-                  <Grid item sx={{ mx: 1 }}>
-                    <Stack direction="row" alignItems="center">
-                      <img src={util.format(weather.forecasts[0].iconUrl, '@2x')} />
-                      <Typography sx={{ fontSize: 62 }}>{weather.forecasts[0].temperature}°</Typography>
-                    </Stack>
+                <Typography sx={{ fontSize: 16 }}>
+                  {`${(weather.forecasts[0].date.getMonth() + 1)
+                    .toString()
+                    .padStart(2, '0')}/${weather.forecasts[0].date.getDate().toString().padStart(2, '0')}(${t(
+                    `label.weatherForecast__week--${weather.forecasts[0].date.getDay()}`
+                  )})`}
+                  &nbsp;&nbsp;
+                  {`~${weather.forecasts[0].date.getHours().toString().padStart(2, '0')}:${weather.forecasts[0].date
+                    .getMinutes()
+                    .toString()
+                    .padStart(2, '0')}`}
+                </Typography>
+                <Grid container alignItems="center" spacing={2}>
+                  <Grid item sx={{ ml: isXs ? 0.5 : 2 }}>
+                    <Box component="img" src={getWeatherIcon(weather.forecasts[0])} />
                   </Grid>
-                  <Grid item sx={{ mx: 1 }}>
+                  <Grid item>
+                    <Typography sx={{ fontSize: 62 }}>{weather.forecasts[0].temperature}°</Typography>
+                  </Grid>
+                  <Grid item>
                     <Stack>
                       <Typography sx={{ fontSize: 22, fontWeight: 'bold' }}>
                         {weather.forecasts[0].description}
@@ -299,95 +345,151 @@ export const WeatherForecast = () => {
             {/* グラフ */}
             <Grid item xs={12} order={{ xs: 1, sm: 2 }}>
               <DarkRoundBox>
-                <Chart
-                  height="150%"
-                  series={
-                    [
-                      {
-                        name: t('label.weatherForecast__temperature'),
-                        data: chartWeather?.map((f) => [f.date, f.temperature]),
+                <Stack>
+                  <Chart
+                    height="100%"
+                    series={
+                      [
+                        {
+                          name: t('label.weatherForecast__temperature'),
+                          data: chartWeather?.map((f) => [f.date, f.temperature]),
+                        },
+                        {
+                          name: t('label.weatherForecast__humidity'),
+                          data: chartWeather?.map((f) => [f.date, f.humidity]),
+                        },
+                      ] as ApexAxisChartSeries
+                    }
+                    options={{
+                      title: {
+                        text: t('label.weatherForecast__24forecast'),
+                        offsetX: 0,
+                        offsetY: 10,
+                        margin: -10,
+                        style: { fontSize: '16', fontWeight: 'normal', color: 'white' },
                       },
-                      {
-                        name: t('label.weatherForecast__humidity'),
-                        data: chartWeather?.map((f) => [f.date, f.humidity]),
+                      grid: {
+                        padding: {
+                          left: leSm ? 0 : 10,
+                          right: leSm ? -10 : 0,
+                        },
                       },
-                    ] as ApexAxisChartSeries
-                  }
-                  options={{
-                    title: {
-                      text: t('label.weatherForecast__24forecast'),
-                      offsetX: 5,
-                      offsetY: 10,
-                      margin: -10,
-                      style: { fontSize: '16', fontWeight: 'normal', color: 'white' },
-                    },
-                    chart: {
-                      defaultLocale: 'ja',
-                      locales: [jaLocale],
-                      toolbar: { show: false },
-                      zoom: { enabled: false },
-                      animations: {
-                        easing: 'easeinout',
-                        animateGradually: { enabled: false },
+                      chart: {
+                        defaultLocale: 'ja',
+                        locales: [jaLocale],
+                        toolbar: { show: false },
+                        zoom: { enabled: false },
+                        animations: {
+                          easing: 'easeinout',
+                          animateGradually: { enabled: false },
+                        },
                       },
-                    },
-                    dataLabels: {
-                      enabled: true,
-                      enabledOnSeries: [0],
-                      style: {
-                        fontSize: '11px',
-                        fontWeight: 'bold',
-                      },
-                    },
-                    tooltip: {
-                      theme: 'dark',
-                      x: { format: 'yyyy/MM/dd HH:mm' },
-                    },
-                    legend: {
-                      show: false,
-                    },
-                    xaxis: {
-                      type: 'datetime',
-                      labels: {
-                        style: { colors: 'white' },
-                        format: 'HH:mm',
-                        datetimeUTC: false,
+                      dataLabels: {
+                        enabled: true,
+                        enabledOnSeries: [0],
+                        style: {
+                          fontSize: '11px',
+                          fontWeight: 'bold',
+                        },
                       },
                       tooltip: {
-                        enabled: false,
+                        theme: 'dark',
+                        x: { format: 'yyyy/MM/dd HH:mm' },
                       },
-                      tickAmount: 'dataPoints',
-                    },
-                    yaxis: [
-                      {
+                      legend: {
+                        show: false,
+                      },
+                      xaxis: {
+                        type: 'datetime',
                         labels: {
                           style: { colors: 'white' },
-                          formatter: (val) => `${val.toFixed(0)}°`,
+                          format: 'HH:mm',
+                          datetimeUTC: false,
                         },
-                        tickAmount: 4,
-                        min: minTemperature,
-                        max: maxTemperature,
-                      },
-                      {
-                        labels: {
-                          style: { colors: 'white' },
-                          formatter: (val) => `${val.toFixed(0)}%`,
+                        tooltip: {
+                          enabled: false,
                         },
-                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                        tickAmount: (maxHumidity! - minHumidity!) / 10,
-                        min: minHumidity,
-                        max: maxHumidity,
-                        opposite: true,
+                        tickAmount: 'dataPoints',
                       },
-                    ],
-                    stroke: {
-                      curve: 'smooth',
-                      width: [3, 3],
-                      dashArray: [0, 3],
-                    },
-                    colors: ['#7FBF7F', '#BF7FFF'],
-                  }}
-                />
+                      yaxis: [
+                        {
+                          labels: {
+                            offsetX: leSm ? -10 : 0,
+                            style: { colors: 'white' },
+                            formatter: (val) => `${val.toFixed(0)}°`,
+                          },
+                          tickAmount: 4,
+                          min: minTemperature,
+                          max: maxTemperature,
+                        },
+                        {
+                          labels: {
+                            offsetX: leSm ? -20 : -10,
+                            style: { colors: 'white' },
+                            formatter: (val) => `${val.toFixed(0)}%`,
+                          },
+                          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                          tickAmount: (maxHumidity! - minHumidity!) / 10,
+                          min: minHumidity,
+                          max: maxHumidity,
+                          opposite: true,
+                        },
+                      ],
+                      stroke: {
+                        curve: 'smooth',
+                        width: [3, 3],
+                        dashArray: [0, 3],
+                      },
+                      colors: ['#7FBF7F', '#BF7FFF'],
+                    }}
+                  />
+
+                  <Grid
+                    container
+                    justifyContent="space-between"
+                    alignItems="center"
+                    wrap="nowrap"
+                    sx={{ pl: '21px', pr: '27px', mb: 0.5 }}
+                  >
+                    {chartWeather?.map((f, i) => (
+                      <Grid item key={`WeatherForecast__chart--weather${i}`}>
+                        <Stack direction="column" alignItems="center">
+                          <Box
+                            component="img"
+                            src={getWeatherIcon(f)}
+                            sx={{
+                              my: 0.5,
+                              width: { xs: '24px', sm: '32px', md: '40px', lg: '48px' },
+                              height: { xs: '24px', sm: '32px', md: '40px', lg: '48px' },
+                            }}
+                          />
+                          {leSm ? (
+                            <>
+                              <NavigationIcon
+                                sx={{
+                                  fontSize: { xs: 14, sm: 18 },
+                                  transform: `rotate(${f.windDeg}deg)`,
+                                }}
+                              />
+                              <Stack direction="row" alignItems="center" sx={{ mt: 0.5 }}>
+                                <Typography sx={{ fontSize: { xs: 13, sm: 16 } }}>{f.windSpeed}</Typography>
+                                <Typography sx={{ fontSize: { xs: 9, sm: 12 } }}>&nbsp;m/s</Typography>
+                              </Stack>
+                            </>
+                          ) : (
+                            <>
+                              <Stack direction="row" alignItems="center">
+                                <Typography sx={{ fontSize: 14 }}>{f.windSpeed} m/s</Typography>
+                                <NavigationIcon sx={{ fontSize: 14, transform: `rotate(${f.windDeg}deg)` }} />
+                              </Stack>
+                              <Typography sx={{ fontSize: 14 }}>{f.description}</Typography>
+                            </>
+                          )}
+                        </Stack>
+                      </Grid>
+                    ))}
+                  </Grid>
+                </Stack>
               </DarkRoundBox>
             </Grid>
 
@@ -405,14 +507,12 @@ export const WeatherForecast = () => {
               }}
             >
               <Stack direction="row" spacing={1}>
-                {groupWeather?.map((x, i) => (
+                {groupWeather?.slice(1).map((x, i) => (
                   <DarkRoundBox key={`WeatherForecast__forecasts${i}`} sx={{ py: 1 }}>
                     <Typography noWrap sx={{ fontSize: 18, mx: 2, mb: 0.5 }}>
                       {i === 0 + groupOffset
-                        ? `${t('label.weatherForecast__date--today')}\u00A0`
-                        : i === 1 + groupOffset
                         ? `${t('label.weatherForecast__date--tomorrow')}\u00A0`
-                        : i === 2 + groupOffset
+                        : i === 1 + groupOffset
                         ? `${t('label.weatherForecast__date--dayAfterTomorrow')}\u00A0`
                         : null}
                       {`${(x[1][0].date.getMonth() + 1).toString().padStart(2, '0')}/${x[1][0].date
@@ -431,7 +531,15 @@ export const WeatherForecast = () => {
                             .getHours()
                             .toString()
                             .padStart(2, '0')}:${f.date.getMinutes().toString().padStart(2, '0')}`}</Typography>
-                          <img src={util.format(f.iconUrl, '')} />
+                          <Box
+                            component="img"
+                            src={getWeatherIcon(f)}
+                            sx={{
+                              my: 0.5,
+                              width: '32px',
+                              height: '32px',
+                            }}
+                          />
                           <Typography sx={{ fontSize: 20, ml: 1 }}>{f.temperature}°</Typography>
                           <Stack direction="row" alignItems="center" sx={{ mt: 0.5 }}>
                             <Typography sx={{ fontSize: 14 }}>{f.windSpeed} m/s</Typography>
