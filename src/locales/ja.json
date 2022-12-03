@@ -17,6 +17,15 @@
   "label.weatherForecast__week--5": "金",
   "label.weatherForecast__week--6": "土",
 
+  "label.weatherForecast__name--Thunderstorm": "雷",
+  "label.weatherForecast__name--Drizzle": "霧雨",
+  "label.weatherForecast__name--Rain": "雨",
+  "label.weatherForecast__name--Snow": "雪",
+  "label.weatherForecast__name--Atmosphere": "煙霧",
+  "label.weatherForecast__name--Clear": "快晴",
+  "label.weatherForecast__name--FewClear": "晴れ",
+  "label.weatherForecast__name--Clouds": "くもり",
+
   "format.weatherForecast__cityWeather": "%s の天気",
 
   "command.getCurrentPosition": "現在地を取得する",

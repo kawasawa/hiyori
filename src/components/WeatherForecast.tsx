@@ -1,6 +1,6 @@
 import './WeatherForecast.css';
 
-import { MyLocation as MyLocationIcon, Navigation as NavigationIcon } from '@mui/icons-material';
+import { Navigation as NavigationIcon, Place as PlaceIcon } from '@mui/icons-material';
 import {
   Backdrop,
   Box,
@@ -26,28 +26,10 @@ import { MapContainer, Marker, Popup, TileLayer } from 'react-leaflet';
 import { toast } from 'react-toastify';
 import * as util from 'util';
 
-import iconCloudy from '../assets/weatherIcon/cloudy.png';
-import iconDay from '../assets/weatherIcon/day.png';
-import iconDayCloudy from '../assets/weatherIcon/day-cloudy.png';
-import iconFoggy from '../assets/weatherIcon/foggy.png';
-import iconNight from '../assets/weatherIcon/night.png';
-import iconNightCloudy from '../assets/weatherIcon/night-cloudy.png';
-import iconRainy from '../assets/weatherIcon/rainy.png';
-import iconSnowy from '../assets/weatherIcon/snowy.png';
-import iconStormy from '../assets/weatherIcon/stormy.png';
-import imageCloudy from '../assets/weatherImage/cloudy.webp';
-import imageDay from '../assets/weatherImage/day.webp';
-import imageDayCloudy from '../assets/weatherImage/day-cloudy.webp';
-import imageFoggy from '../assets/weatherImage/foggy.webp';
-import imageNight from '../assets/weatherImage/night.webp';
-import imageNightCloudy from '../assets/weatherImage/night-cloudy.webp';
-import imageRainy from '../assets/weatherImage/rainy.webp';
-import imageSnowy from '../assets/weatherImage/snowy.webp';
-import imageStormy from '../assets/weatherImage/stormy.webp';
 import { useWeatherForecast } from '../hooks';
-import { Forecast } from '../hooks/useWeatherForecast';
 import { groupBy } from '../utils/array';
 import { handleError } from '../utils/errors';
+import { getWeatherIcon, getWeatherImage, getWeatherName } from '../utils/forecasts';
 
 Leaflet.Icon.Default.imagePath = '//cdnjs.cloudflare.com/ajax/libs/leaflet/1.8.0/images/';
 
@@ -117,54 +99,6 @@ export const WeatherForecast = () => {
       Math.max((Math.floor(chartWeather.map((f) => f.humidity).reduce((_1, _2) => Math.min(_1, _2)) / 10) - 1) * 10, 0),
     [chartWeather]
   );
-
-  const inDayTime = (date: Date) => 6 <= date.getHours() && date.getHours() <= 18;
-
-  // eslint-disable-next-line complexity
-  const getWeatherImage = useCallback((forecast: Forecast) => {
-    switch (forecast.group) {
-      case 'Thunderstorm':
-        return imageStormy;
-      case 'Drizzle':
-        return imageRainy;
-      case 'Rain':
-        return imageRainy;
-      case 'Snow':
-        return imageSnowy;
-      case 'Atmosphere':
-        return imageFoggy;
-      case 'Clouds':
-        return imageCloudy;
-      case 'FewClouds':
-        return inDayTime(forecast.date) ? imageDayCloudy : imageNightCloudy;
-      case 'Clear':
-      default:
-        return inDayTime(forecast.date) ? imageDay : imageNight;
-    }
-  }, []);
-
-  // eslint-disable-next-line complexity
-  const getWeatherIcon = useCallback((forecast: Forecast) => {
-    switch (forecast.group) {
-      case 'Thunderstorm':
-        return iconStormy;
-      case 'Drizzle':
-        return iconRainy;
-      case 'Rain':
-        return iconRainy;
-      case 'Snow':
-        return iconSnowy;
-      case 'Atmosphere':
-        return iconFoggy;
-      case 'Clouds':
-        return iconCloudy;
-      case 'FewClouds':
-        return inDayTime(forecast.date) ? iconDayCloudy : iconNightCloudy;
-      case 'Clear':
-      default:
-        return inDayTime(forecast.date) ? iconDay : iconNight;
-    }
-  }, []);
 
   const onMarkerDragend = useCallback(() => {
     const marker = markerRef.current;
@@ -240,7 +174,7 @@ export const WeatherForecast = () => {
                       disabled={isPending}
                       onClick={onClickGetCurrentPosition}
                     >
-                      <MyLocationIcon />
+                      <PlaceIcon />
                     </IconButton>
                   </Tooltip>
                 </Stack>
@@ -263,50 +197,62 @@ export const WeatherForecast = () => {
                   <Grid item>
                     <Typography sx={{ fontSize: 62 }}>{weather.forecasts[0].temperature}°</Typography>
                   </Grid>
-                  <Grid item>
+                  <Grid item sx={{ ml: isXs ? 0 : 1 }}>
                     <Stack>
-                      <Typography sx={{ fontSize: 22, fontWeight: 'bold' }}>
-                        {weather.forecasts[0].description}
+                      <Typography sx={{ fontSize: isXs ? 22 : 24, fontWeight: 'bold' }}>
+                        {getWeatherName(weather.forecasts[0], t)}
                       </Typography>
-                      <Typography sx={{ fontSize: 16 }}>
+                      <Typography sx={{ fontSize: isXs ? 15 : 18 }}>
                         {t('label.weatherForecast__feelsLike')} {weather.forecasts[0].feelsLike}°
                       </Typography>
                     </Stack>
                   </Grid>
                 </Grid>
-                <Grid container alignItems="center" sx={{ mt: 1 }}>
-                  <Grid item sx={{ mr: 2 }}>
+                <Grid container alignItems="center" spacing={isXs ? 1.5 : 3}>
+                  <Grid item>
                     <Stack>
                       <Typography sx={{ fontSize: 13 }}>{t('label.weatherForecast__windSpeed')}</Typography>
                       <Stack direction="row" alignItems="center">
-                        <Typography sx={{ fontSize: 20 }}>{weather.forecasts[0]?.windSpeed} m/s</Typography>
+                        <Typography sx={{ fontSize: 20 }}>{weather.forecasts[0]?.windSpeed}</Typography>
+                        <Typography sx={{ fontSize: 16 }}>&nbsp;m/s</Typography>
                         <NavigationIcon
                           sx={{ fontSize: 20, transform: `rotate(${weather.forecasts[0]?.windDeg}deg)` }}
                         />
                       </Stack>
                     </Stack>
                   </Grid>
-                  <Grid item sx={{ mr: 2 }}>
+                  <Grid item>
                     <Stack>
                       <Typography sx={{ fontSize: 13 }}>{t('label.weatherForecast__humidity')}</Typography>
-                      <Typography sx={{ fontSize: 20 }}>{weather.forecasts[0]?.humidity}%</Typography>
+                      <Stack direction="row" alignItems="center">
+                        <Typography sx={{ fontSize: 20 }}>{weather.forecasts[0]?.humidity}</Typography>
+                        <Typography sx={{ fontSize: 16 }}>&nbsp;%</Typography>
+                      </Stack>
                     </Stack>
                   </Grid>
-                  <Grid item sx={{ mr: 2 }}>
+                  <Grid item>
                     <Stack>
                       <Typography sx={{ fontSize: 13 }}>{t('label.weatherForecast__visibility')}</Typography>
-                      <Typography sx={{ fontSize: 20 }}>
-                        {/* km は小数点以下第一位まで表示 */}
-                        {weather.forecasts[0]?.visibility < 1000
-                          ? `${weather.forecasts[0]?.visibility} m`
-                          : `${Math.floor(weather.forecasts[0]?.visibility / 100) / 10} km`}
-                      </Typography>
+                      <Stack direction="row" alignItems="center">
+                        <Typography sx={{ fontSize: 20 }}>
+                          {/* km は小数点以下第一位まで表示 */}
+                          {weather.forecasts[0]?.visibility < 1000
+                            ? weather.forecasts[0]?.visibility
+                            : Math.floor(weather.forecasts[0]?.visibility / 100) / 10}
+                        </Typography>
+                        <Typography sx={{ fontSize: 16 }}>
+                          &nbsp;{weather.forecasts[0]?.visibility < 1000 ? 'm' : 'km'}
+                        </Typography>
+                      </Stack>
                     </Stack>
                   </Grid>
                   <Grid item>
                     <Stack>
                       <Typography sx={{ fontSize: 13 }}>{t('label.weatherForecast__pressure')}</Typography>
-                      <Typography sx={{ fontSize: 20 }}>{weather.forecasts[0]?.pressure} hPa</Typography>
+                      <Stack direction="row" alignItems="center">
+                        <Typography sx={{ fontSize: 20 }}>{weather.forecasts[0]?.pressure}</Typography>
+                        <Typography sx={{ fontSize: 16 }}>&nbsp;hPa</Typography>
+                      </Stack>
                     </Stack>
                   </Grid>
                 </Grid>
@@ -482,7 +428,7 @@ export const WeatherForecast = () => {
                                 <Typography sx={{ fontSize: 14 }}>{f.windSpeed} m/s</Typography>
                                 <NavigationIcon sx={{ fontSize: 14, transform: `rotate(${f.windDeg}deg)` }} />
                               </Stack>
-                              <Typography sx={{ fontSize: 14 }}>{f.description}</Typography>
+                              <Typography sx={{ fontSize: 14 }}>{getWeatherName(f, t)}</Typography>
                             </>
                           )}
                         </Stack>
@@ -542,10 +488,11 @@ export const WeatherForecast = () => {
                           />
                           <Typography sx={{ fontSize: 20, ml: 1 }}>{f.temperature}°</Typography>
                           <Stack direction="row" alignItems="center" sx={{ mt: 0.5 }}>
-                            <Typography sx={{ fontSize: 14 }}>{f.windSpeed} m/s</Typography>
+                            <Typography sx={{ fontSize: 14 }}>{f.windSpeed}</Typography>
+                            <Typography sx={{ fontSize: 12 }}>&nbsp;m/s&nbsp;</Typography>
                             <NavigationIcon sx={{ fontSize: 14, transform: `rotate(${f.windDeg}deg)` }} />
                           </Stack>
-                          <Typography sx={{ fontSize: 14 }}>{f.description}</Typography>
+                          <Typography sx={{ fontSize: 14 }}>{getWeatherName(f, t)}</Typography>
                         </Stack>
                       ))}
                     </Stack>

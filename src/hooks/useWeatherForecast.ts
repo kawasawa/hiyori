@@ -9,11 +9,14 @@ export type WeatherGroup =
   | 'Thunderstorm'
   | 'Drizzle'
   | 'Rain'
+  | 'HeavyRain'
   | 'Snow'
   | 'Atmosphere'
   | 'Clear'
+  | 'FewClear'
+  | 'FewClouds'
   | 'Clouds'
-  | 'FewClouds';
+  | 'DeepClouds';
 
 export type Forecast = {
   date: Date;
@@ -47,12 +50,16 @@ export type Weather = {
  * @param weatherId WeatherID
  * @returns WeatherGroup
  */
+// eslint-disable-next-line complexity
 const getWeatherGroup = (weatherId: number): WeatherGroup => {
-  if (803 <= weatherId) return 'Clouds';
-  if (801 <= weatherId) return 'FewClouds'; // これは独自の区分、曇りの状態を２つに分ける
-  if (800 === weatherId) return 'Clear';
+  if (804 <= weatherId) return 'DeepClouds'; // 雲量85%以上をくもりと定義する
+  if (803 <= weatherId) return 'Clouds'; // 雲量51%-84%をくもりと定義する
+  if (802 <= weatherId) return 'FewClouds'; // 雲量25%-50%を晴れと定義する
+  if (801 <= weatherId) return 'FewClear'; // 雲量11%-25%を晴れと定義する
+  if (800 === weatherId) return 'Clear'; // 雲量10%以下を快晴と定義する
   if (700 <= weatherId) return 'Atmosphere';
   if (600 <= weatherId) return 'Snow';
+  if ([502, 503, 504, 522, 531].includes(weatherId)) return 'HeavyRain'; // 一部の雨を豪雨と定義する
   if (500 <= weatherId) return 'Rain';
   if (300 <= weatherId) return 'Drizzle';
   if (200 <= weatherId) return 'Thunderstorm';
