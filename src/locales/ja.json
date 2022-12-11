@@ -6,6 +6,7 @@
   "label.weatherForecast__visibility": "視界",
   "label.weatherForecast__pressure": "気圧",
   "label.weatherForecast__24forecast": "24時間推移",
+  "label.weatherForecast__weekTemperature": "その先の気温予想",
   "label.weatherForecast__date--today": "本日",
   "label.weatherForecast__date--tomorrow": "明日",
   "label.weatherForecast__date--dayAfterTomorrow": "明後日",

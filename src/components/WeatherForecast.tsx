@@ -10,6 +10,7 @@ import {
   Grid,
   IconButton,
   LinearProgress,
+  Slider,
   Stack,
   styled,
   Tooltip,
@@ -77,27 +78,30 @@ export const WeatherForecast = () => {
 
   const chartWeather = useMemo(() => weather && weather.forecasts.slice(0, DAY_VERTEX_COUNT + 1), [weather]);
   const maxTemperature = useMemo(
-    () => chartWeather && chartWeather.map((f) => f.temperature).reduce((_1, _2) => Math.max(_1, _2)) + 1,
-    [chartWeather]
+    () => weather && weather.forecasts.map((f) => f.temperature).reduce((_1, _2) => Math.max(_1, _2)) + 1,
+    [weather]
   );
   const minTemperature = useMemo(
-    () => chartWeather && chartWeather.map((f) => f.temperature).reduce((_1, _2) => Math.min(_1, _2)) - 1,
-    [chartWeather]
+    () => weather && weather.forecasts.map((f) => f.temperature).reduce((_1, _2) => Math.min(_1, _2)) - 1,
+    [weather]
   );
   const maxHumidity = useMemo(
     () =>
-      chartWeather &&
+      weather &&
       Math.min(
-        (Math.floor(chartWeather.map((f) => f.humidity).reduce((_1, _2) => Math.max(_1, _2)) / 10) + 1) * 10,
+        (Math.floor(weather.forecasts.map((f) => f.humidity).reduce((_1, _2) => Math.max(_1, _2)) / 10) + 1) * 10,
         100
       ),
-    [chartWeather]
+    [weather]
   );
   const minHumidity = useMemo(
     () =>
-      chartWeather &&
-      Math.max((Math.floor(chartWeather.map((f) => f.humidity).reduce((_1, _2) => Math.min(_1, _2)) / 10) - 1) * 10, 0),
-    [chartWeather]
+      weather &&
+      Math.max(
+        (Math.floor(weather.forecasts.map((f) => f.humidity).reduce((_1, _2) => Math.min(_1, _2)) / 10) - 1) * 10,
+        0
+      ),
+    [weather]
   );
 
   const onMarkerDragend = useCallback(() => {
@@ -162,7 +166,7 @@ export const WeatherForecast = () => {
         <Container sx={{ pt: [4, 12], pb: [4, 12] }}>
           <Grid container spacing={2}>
             {/* 現在の気象情報 */}
-            <Grid item xs={12} sm={7} order={0}>
+            <Grid item xs={12} sm={6} order={0}>
               <DarkRoundBox sx={{ p: [2, 4] }}>
                 <Stack direction="row" alignItems="center" spacing={1.5}>
                   <Typography sx={{ fontSize: 20, fontWeight: 'bold' }}>
@@ -178,27 +182,27 @@ export const WeatherForecast = () => {
                     </IconButton>
                   </Tooltip>
                 </Stack>
-                <Typography sx={{ fontSize: 16 }}>
+                <Typography sx={{ fontSize: 18 }}>
                   {`${(weather.forecasts[0].date.getMonth() + 1)
                     .toString()
                     .padStart(2, '0')}/${weather.forecasts[0].date.getDate().toString().padStart(2, '0')}(${t(
                     `label.weatherForecast__week--${weather.forecasts[0].date.getDay()}`
                   )})`}
                   &nbsp;&nbsp;
-                  {`~${weather.forecasts[0].date.getHours().toString().padStart(2, '0')}:${weather.forecasts[0].date
+                  {`~ ${weather.forecasts[0].date.getHours().toString().padStart(2, '0')}:${weather.forecasts[0].date
                     .getMinutes()
                     .toString()
                     .padStart(2, '0')}`}
                 </Typography>
-                <Grid container alignItems="center" spacing={2}>
-                  <Grid item sx={{ ml: isXs ? 0.5 : 2 }}>
-                    <Box component="img" src={getWeatherIcon(weather.forecasts[0])} />
+                <Grid container alignItems="center" spacing={1.5}>
+                  <Grid item>
+                    <Stack direction="row" alignItems="center" spacing={1.5}>
+                      <Box component="img" src={getWeatherIcon(weather.forecasts[0])} />
+                      <Typography sx={{ fontSize: 62 }}>{weather.forecasts[0].temperature}°</Typography>
+                    </Stack>
                   </Grid>
                   <Grid item>
-                    <Typography sx={{ fontSize: 62 }}>{weather.forecasts[0].temperature}°</Typography>
-                  </Grid>
-                  <Grid item sx={{ ml: isXs ? 0 : 1 }}>
-                    <Stack>
+                    <Stack direction="column">
                       <Typography sx={{ fontSize: isXs ? 22 : 24, fontWeight: 'bold' }}>
                         {getWeatherName(weather.forecasts[0], t)}
                       </Typography>
@@ -208,20 +212,31 @@ export const WeatherForecast = () => {
                     </Stack>
                   </Grid>
                 </Grid>
-                <Grid container alignItems="center" spacing={isXs ? 1.5 : 3}>
-                  <Grid item>
+                <Grid container alignItems="center" spacing={leSm ? 1.5 : 3}>
+                  <Grid item md={3}>
                     <Stack>
                       <Typography sx={{ fontSize: 13 }}>{t('label.weatherForecast__windSpeed')}</Typography>
                       <Stack direction="row" alignItems="center">
                         <Typography sx={{ fontSize: 20 }}>{weather.forecasts[0]?.windSpeed}</Typography>
                         <Typography sx={{ fontSize: 16 }}>&nbsp;m/s</Typography>
                         <NavigationIcon
-                          sx={{ fontSize: 20, transform: `rotate(${weather.forecasts[0]?.windDeg}deg)` }}
+                          sx={{
+                            fontSize: 20,
+                            transform: `rotate(${weather.forecasts[0]?.windDeg}deg)`,
+                            color:
+                              20 <= weather.forecasts[0]?.windSpeed
+                                ? 'red'
+                                : 15 <= weather.forecasts[0]?.windSpeed
+                                ? 'orange'
+                                : 10 <= weather.forecasts[0]?.windSpeed
+                                ? 'yellow'
+                                : 'auto',
+                          }}
                         />
                       </Stack>
                     </Stack>
                   </Grid>
-                  <Grid item>
+                  <Grid item md={3}>
                     <Stack>
                       <Typography sx={{ fontSize: 13 }}>{t('label.weatherForecast__humidity')}</Typography>
                       <Stack direction="row" alignItems="center">
@@ -230,7 +245,7 @@ export const WeatherForecast = () => {
                       </Stack>
                     </Stack>
                   </Grid>
-                  <Grid item>
+                  <Grid item md={3}>
                     <Stack>
                       <Typography sx={{ fontSize: 13 }}>{t('label.weatherForecast__visibility')}</Typography>
                       <Stack direction="row" alignItems="center">
@@ -246,7 +261,7 @@ export const WeatherForecast = () => {
                       </Stack>
                     </Stack>
                   </Grid>
-                  <Grid item>
+                  <Grid item md={3}>
                     <Stack>
                       <Typography sx={{ fontSize: 13 }}>{t('label.weatherForecast__pressure')}</Typography>
                       <Stack direction="row" alignItems="center">
@@ -260,7 +275,7 @@ export const WeatherForecast = () => {
             </Grid>
 
             {/* マップ */}
-            <Grid item xs={12} sm={5} order={{ xs: 3, sm: 1 }}>
+            <Grid item xs={12} sm={6} order={{ xs: 4, sm: 1 }}>
               <DarkRoundBox sx={{ height: ['150px', '100%'] }}>
                 <MapContainer
                   ref={mapRef}
@@ -289,7 +304,7 @@ export const WeatherForecast = () => {
             </Grid>
 
             {/* グラフ */}
-            <Grid item xs={12} order={{ xs: 1, sm: 2 }}>
+            <Grid item xs={12} sm={7} md={8} lg={9} order={{ xs: 1, sm: 2 }}>
               <DarkRoundBox>
                 <Stack>
                   <Chart
@@ -309,10 +324,10 @@ export const WeatherForecast = () => {
                     options={{
                       title: {
                         text: t('label.weatherForecast__24forecast'),
-                        offsetX: 0,
-                        offsetY: 10,
-                        margin: -10,
-                        style: { fontSize: '16', fontWeight: 'normal', color: 'white' },
+                        offsetX: 6,
+                        offsetY: 12,
+                        margin: -8,
+                        style: { fontSize: '18', fontWeight: 'normal', color: 'white' },
                       },
                       grid: {
                         padding: {
@@ -405,8 +420,8 @@ export const WeatherForecast = () => {
                             src={getWeatherIcon(f)}
                             sx={{
                               my: 0.5,
-                              width: { xs: '24px', sm: '32px', md: '40px', lg: '48px' },
-                              height: { xs: '24px', sm: '32px', md: '40px', lg: '48px' },
+                              width: { xs: '24px', sm: '30px', md: '40px', lg: '48px' },
+                              height: { xs: '24px', sm: '30px', md: '40px', lg: '48px' },
                             }}
                           />
                           {leSm ? (
@@ -415,6 +430,14 @@ export const WeatherForecast = () => {
                                 sx={{
                                   fontSize: { xs: 14, sm: 18 },
                                   transform: `rotate(${f.windDeg}deg)`,
+                                  color:
+                                    20 <= f.windSpeed
+                                      ? 'red'
+                                      : 15 <= f.windSpeed
+                                      ? 'orange'
+                                      : 10 <= f.windSpeed
+                                      ? 'yellow'
+                                      : 'auto',
                                 }}
                               />
                               <Stack direction="row" alignItems="center" sx={{ mt: 0.5 }}>
@@ -426,7 +449,20 @@ export const WeatherForecast = () => {
                             <>
                               <Stack direction="row" alignItems="center">
                                 <Typography sx={{ fontSize: 14 }}>{f.windSpeed} m/s</Typography>
-                                <NavigationIcon sx={{ fontSize: 14, transform: `rotate(${f.windDeg}deg)` }} />
+                                <NavigationIcon
+                                  sx={{
+                                    fontSize: 14,
+                                    transform: `rotate(${f.windDeg}deg)`,
+                                    color:
+                                      20 <= f.windSpeed
+                                        ? 'red'
+                                        : 15 <= f.windSpeed
+                                        ? 'orange'
+                                        : 10 <= f.windSpeed
+                                        ? 'yellow'
+                                        : 'auto',
+                                  }}
+                                />
                               </Stack>
                               <Typography sx={{ fontSize: 14 }}>{getWeatherName(f, t)}</Typography>
                             </>
@@ -439,11 +475,68 @@ export const WeatherForecast = () => {
               </DarkRoundBox>
             </Grid>
 
+            {/* その先の気温予想 */}
+            <Grid item xs={12} sm={5} md={4} lg={3} order={{ xs: 2, sm: 3 }}>
+              <DarkRoundBox sx={{ px: 2, pt: 1, pb: 2, height: isXs ? 'auto' : 'calc(100% - 24px)' }}>
+                <Typography noWrap sx={{ fontSize: 18, mb: 1.5 }}>
+                  {t('label.weatherForecast__weekTemperature')}
+                </Typography>
+                <Stack spacing={isXs ? 1 : 2}>
+                  {groupWeather?.slice(1).map((x, i) => {
+                    if (x[1].length !== DAY_VERTEX_COUNT) return <></>;
+                    const minDayTemp = x[1].map((f) => f.temperature).reduce((_1, _2) => Math.min(_1, _2));
+                    const maxDayTemp = x[1].map((f) => f.temperature).reduce((_1, _2) => Math.max(_1, _2));
+                    return (
+                      <Stack
+                        key={`WeatherForecast__temperatures${i}`}
+                        direction="row"
+                        alignItems="center"
+                        spacing={1}
+                        sx={{ width: '100%' }}
+                      >
+                        <Typography align="center" lineHeight={1.2}>
+                          {(x[1][0].date.getMonth() + 1).toString().padStart(2, '0')}/
+                          {x[1][0].date.getDate().toString().padStart(2, '0')}
+                          <br />({t(`label.weatherForecast__week--${x[1][0].date.getDay()}`)})
+                        </Typography>
+                        <Slider
+                          min={minTemperature}
+                          max={maxTemperature}
+                          marks={[
+                            { value: minDayTemp, label: `${minDayTemp}°` },
+                            { value: maxDayTemp, label: `${maxDayTemp}°` },
+                          ]}
+                          value={[minDayTemp, maxDayTemp]}
+                          valueLabelDisplay="off"
+                          sx={{
+                            '& .MuiSlider-track': {
+                              color: '#7EBD7F',
+                              height: '2px',
+                            },
+                            '& .MuiSlider-thumb.Mui-disabled': {
+                              color: '#7EBD7F',
+                              width: '14px',
+                              height: '14px',
+                            },
+                            '& .MuiSlider-markLabel': {
+                              top: '32px',
+                              marginLeft: '2px',
+                            },
+                          }}
+                          disabled
+                        />
+                      </Stack>
+                    );
+                  })}
+                </Stack>
+              </DarkRoundBox>
+            </Grid>
+
             {/* 長期予報 */}
             <Grid
               item
               xs={12}
-              order={{ xs: 2, sm: 3 }}
+              order={{ xs: 3, sm: 4 }}
               sx={{
                 overflowY: 'hidden',
                 overflowX: 'scroll',
@@ -452,52 +545,56 @@ export const WeatherForecast = () => {
                 '&::-webkit-scrollbar': { display: 'none' }, // Chrome, Safari
               }}
             >
-              <Stack direction="row" spacing={1}>
-                {groupWeather?.slice(1).map((x, i) => (
-                  <DarkRoundBox key={`WeatherForecast__forecasts${i}`} sx={{ py: 1 }}>
-                    <Typography noWrap sx={{ fontSize: 18, mx: 2, mb: 0.5 }}>
-                      {i === 0 + groupOffset
-                        ? `${t('label.weatherForecast__date--tomorrow')}\u00A0`
-                        : i === 1 + groupOffset
-                        ? `${t('label.weatherForecast__date--dayAfterTomorrow')}\u00A0`
-                        : null}
-                      {`${(x[1][0].date.getMonth() + 1).toString().padStart(2, '0')}/${x[1][0].date
-                        .getDate()
-                        .toString()
-                        .padStart(2, '0')}(${t(`label.weatherForecast__week--${x[1][0].date.getDay()}`)})`}
-                      {x[1].length === DAY_VERTEX_COUNT &&
-                        `\u00A0\u00A0${x[1].map((f) => f.temperature).reduce((_1, _2) => Math.min(_1, _2))}°~ ${x[1]
-                          .map((f) => f.temperature)
-                          .reduce((_1, _2) => Math.max(_1, _2))}°`}
-                    </Typography>
-                    <Stack direction="row" spacing={1} sx={{ mx: 1 }}>
-                      {x[1].map((f, j) => (
-                        <Stack key={`WeatherForecast__forecasts${i}--info${j}`} direction="column" alignItems="center">
-                          <Typography noWrap sx={{ fontSize: 16, mx: 1.5 }}>{`${f.date
-                            .getHours()
+              <Stack direction="row" spacing={2}>
+                {groupWeather?.slice(1).map(
+                  (x, i) =>
+                    x[1].length === DAY_VERTEX_COUNT && (
+                      <DarkRoundBox key={`WeatherForecast__forecasts${i}`} sx={{ px: 2, py: 1 }}>
+                        <Typography noWrap sx={{ fontSize: 18, mb: 0.5 }}>
+                          {i === 0 + groupOffset
+                            ? `${t('label.weatherForecast__date--tomorrow')}\u00A0`
+                            : i === 1 + groupOffset
+                            ? `${t('label.weatherForecast__date--dayAfterTomorrow')}\u00A0`
+                            : null}
+                          {`${(x[1][0].date.getMonth() + 1).toString().padStart(2, '0')}/${x[1][0].date
+                            .getDate()
                             .toString()
-                            .padStart(2, '0')}:${f.date.getMinutes().toString().padStart(2, '0')}`}</Typography>
-                          <Box
-                            component="img"
-                            src={getWeatherIcon(f)}
-                            sx={{
-                              my: 0.5,
-                              width: '32px',
-                              height: '32px',
-                            }}
-                          />
-                          <Typography sx={{ fontSize: 20, ml: 1 }}>{f.temperature}°</Typography>
-                          <Stack direction="row" alignItems="center" sx={{ mt: 0.5 }}>
-                            <Typography sx={{ fontSize: 14 }}>{f.windSpeed}</Typography>
-                            <Typography sx={{ fontSize: 12 }}>&nbsp;m/s&nbsp;</Typography>
-                            <NavigationIcon sx={{ fontSize: 14, transform: `rotate(${f.windDeg}deg)` }} />
-                          </Stack>
-                          <Typography sx={{ fontSize: 14 }}>{getWeatherName(f, t)}</Typography>
+                            .padStart(2, '0')}(${t(
+                            `label.weatherForecast__week--${x[1][0].date.getDay()}`
+                          )})\u00A0\u00A0${x[1].map((f) => f.temperature).reduce((_1, _2) => Math.min(_1, _2))}°~ ${x[1]
+                            .map((f) => f.temperature)
+                            .reduce((_1, _2) => Math.max(_1, _2))}°`}
+                        </Typography>
+                        <Stack direction="row" spacing={2}>
+                          {x[1].map((f, j) => (
+                            <Stack
+                              key={`WeatherForecast__forecasts${i}--info${j}`}
+                              direction="column"
+                              alignItems="center"
+                            >
+                              <Typography noWrap sx={{ fontSize: 16 }}>{`${f.date
+                                .getHours()
+                                .toString()
+                                .padStart(2, '0')}:${f.date.getMinutes().toString().padStart(2, '0')}`}</Typography>
+                              <Box
+                                component="img"
+                                src={getWeatherIcon(f)}
+                                sx={{
+                                  my: 0.5,
+                                  width: '32px',
+                                  height: '32px',
+                                }}
+                              />
+                              <Typography sx={{ fontSize: 20, ml: 0.5 }}>{f.temperature}°</Typography>
+                              <Typography sx={{ fontSize: 14 }} noWrap>
+                                {getWeatherName(f, t)}
+                              </Typography>
+                            </Stack>
+                          ))}
                         </Stack>
-                      ))}
-                    </Stack>
-                  </DarkRoundBox>
-                ))}
+                      </DarkRoundBox>
+                    )
+                )}
               </Stack>
             </Grid>
           </Grid>
