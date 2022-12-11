@@ -12,6 +12,10 @@ export const Footer = () => {
           OpenWeatherMap
         </Link>
         {', '}
+        <Link href={constants.url.pixabay} target="_blank" color="inherit" underline="always">
+          Pixabay
+        </Link>
+        {', '}
         <Link href={constants.url.flaticon} target="_blank" color="inherit" underline="always">
           Flaticon
         </Link>

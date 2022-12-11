@@ -1,0 +1,35 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "ignorePaths": [
+    ".git/",
+    ".github/",
+    ".vscode/",
+    ".workspace/",
+    "build/",
+    "coverage/",
+    "dist/",
+    "node_modules/",
+    "*.test.*",
+    "yarn.lock"
+  ],
+  "words": [
+    "apexcharts",
+    "awasawa",
+    "cacheable",
+    "cdnjs",
+    "easeinout",
+    "flaticon",
+    "grnd",
+    "hiyori",
+    "kazuki",
+    "pixabay",
+    "precache",
+    "precached",
+    "precaching",
+    "toastify",
+    "ttfb",
+    "xaxis",
+    "yaxis"
+  ]
+}

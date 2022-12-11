@@ -2,7 +2,7 @@
 
 ## 概要
 
-気象情報を一覧できる Web サイトです。現在位置における数日先までの気象予報をまとめて確認できます。
+気象情報を一覧できる Web サイトです。現在位置における直近から数日先までの三時間ごとの天気、気温、湿度、風の情報をまとめて確認できます。
 
 ### 表示される情報
 
@@ -14,9 +14,9 @@
 1. 視界
 1. 気圧
 
-![device](./.workspace/hiyori-device.png)
+![device](./.workspace/mobile.png)
 
-![pc](./.workspace/hiyori-pc.png)
+![pc](./.workspace/pc.jpg)
 
 ## 技術情報
 
@@ -28,8 +28,8 @@ OpenWeatherMap から提供される API により気象情報を取得、Leafle
 | 開発言語                     | [TypeScript](https://www.typescriptlang.org/) |
 | フロントエンドフレームワーク | [React](https://ja.reactjs.org/)              |
 | CSS フレームワーク           | [MUI (Material UI)](https://mui.com/)         |
-| フォーマッター               | [Prettier](https://prettier.io/)              |
 | リンター                     | [ESLint](https://eslint.org/)                 |
+| フォーマッター               | [Prettier](https://prettier.io/)              |
 | パッケージマネージャー       | [Yarn](https://yarnpkg.com/)                  |
 | 地図表示ライブラリ           | [Leaflet](https://leafletjs.com/)             |
 | 気象情報 API                 | [OpenWeatherMap](https://openweathermap.org/) |

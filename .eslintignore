@@ -1,7 +1,9 @@
 .git/
 .github/
 .vscode/
+.workspace/
 build/
 coverage/
+dist/
 node_modules/
 public/
