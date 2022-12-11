@@ -20,13 +20,13 @@ import imageNightCloudy from '../assets/weatherImage/night-cloudy.webp';
 import imageRainy from '../assets/weatherImage/rainy.webp';
 import imageSnowy from '../assets/weatherImage/snowy.webp';
 import imageStormy from '../assets/weatherImage/stormy.webp';
-import { Forecast } from '../hooks';
+import { Weather } from '../entities/weather';
 
 export const inDayTime = (date: Date) => 6 <= date.getHours() && date.getHours() <= 18;
 
 // eslint-disable-next-line complexity
-export const getWeatherImage = (forecast: Forecast) => {
-  switch (forecast.group) {
+export const getWeatherImage = (weather: Weather) => {
+  switch (weather.type) {
     case 'Thunderstorm':
       return imageStormy;
     case 'Drizzle':
@@ -39,20 +39,20 @@ export const getWeatherImage = (forecast: Forecast) => {
     case 'Atmosphere':
       return imageFoggy;
     case 'FewClouds':
-      return inDayTime(forecast.date) ? imageDayCloudy : imageNightCloudy;
+      return inDayTime(weather.date) ? imageDayCloudy : imageNightCloudy;
     case 'Clouds':
     case 'DeepClouds':
       return imageCloudy;
     case 'Clear':
     case 'FewClear':
     default:
-      return inDayTime(forecast.date) ? imageDay : imageNight;
+      return inDayTime(weather.date) ? imageDay : imageNight;
   }
 };
 
 // eslint-disable-next-line complexity
-export const getWeatherIcon = (forecast: Forecast) => {
-  switch (forecast.group) {
+export const getWeatherIcon = (weather: Weather) => {
+  switch (weather.type) {
     case 'Thunderstorm':
       return iconStormy;
     case 'Drizzle':
@@ -65,7 +65,7 @@ export const getWeatherIcon = (forecast: Forecast) => {
     case 'Atmosphere':
       return iconFoggy;
     case 'FewClouds':
-      return inDayTime(forecast.date) ? iconDayCloudy : iconNightCloudy;
+      return inDayTime(weather.date) ? iconDayCloudy : iconNightCloudy;
     case 'Clouds':
       return iconCloudy;
     case 'DeepClouds':
@@ -73,13 +73,13 @@ export const getWeatherIcon = (forecast: Forecast) => {
     case 'Clear':
     case 'FewClear':
     default:
-      return inDayTime(forecast.date) ? iconDay : iconNight;
+      return inDayTime(weather.date) ? iconDay : iconNight;
   }
 };
 
 // eslint-disable-next-line complexity
-export const getWeatherName = (forecast: Forecast, t: TFunction<'translation', undefined>) => {
-  switch (forecast.group) {
+export const getWeatherName = (forecast: Weather, t: TFunction<'translation', undefined>) => {
+  switch (forecast.type) {
     case 'Thunderstorm':
     case 'Drizzle':
     case 'Rain':
@@ -88,7 +88,7 @@ export const getWeatherName = (forecast: Forecast, t: TFunction<'translation', u
     case 'FewClear':
     case 'Clouds':
     case 'Clear':
-      return t(`label.weatherForecast__name--${forecast.group}`);
+      return t(`label.weatherForecast__name--${forecast.type}`);
     case 'HeavyRain':
       return t('label.weatherForecast__name--Rain');
     case 'DeepClouds':
