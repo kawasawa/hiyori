@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/hiyori/static/css/main.847993ec.css",
-    "main.js": "/hiyori/static/js/main.a3e647b4.js",
+    "main.js": "/hiyori/static/js/main.6e124a1f.js",
     "static/js/27.d4d868b1.chunk.js": "/hiyori/static/js/27.d4d868b1.chunk.js",
     "static/media/rainy.webp": "/hiyori/static/media/rainy.c2c156cc6b87ad584e83.webp",
     "static/media/foggy.webp": "/hiyori/static/media/foggy.78d3af0b4233941d63c5.webp",
@@ -17,6 +17,6 @@
   },
   "entrypoints": [
     "static/css/main.847993ec.css",
-    "static/js/main.a3e647b4.js"
+    "static/js/main.6e124a1f.js"
   ]
 }
