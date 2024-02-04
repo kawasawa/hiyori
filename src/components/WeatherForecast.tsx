@@ -120,16 +120,18 @@ export const WeatherForecast = () => {
   }, [t]);
 
   useEffect(() => {
+    // TODO: ユーザからの要求無しに現在地の取得が不可に Only request geolocation information in response to a user gesture.
+    setCoord(new LatLng(35.69, 139.69));
     // 初回レンダリング時に現在地を取得する
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setCoord(new LatLng(position.coords.latitude, position.coords.longitude));
-      },
-      (error) => {
-        setCoord(new LatLng(35.69, 139.69));
-        console.log(error);
-      }
-    );
+    // navigator.geolocation.getCurrentPosition(
+    //   (position) => {
+    //     setCoord(new LatLng(position.coords.latitude, position.coords.longitude));
+    //   },
+    //   (error) => {
+    //     setCoord(new LatLng(35.69, 139.69));
+    //     console.log(error);
+    //   }
+    // );
   }, []);
 
   useEffect(() => {
